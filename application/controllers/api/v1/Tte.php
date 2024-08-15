@@ -298,26 +298,27 @@ class Tte extends General
         if (!file_exists($logoPath)) {
             throw new Exception('Logo file not found.');
         }
-        $logoImage = imagecreatefrompng($logoPath);
+        $logoImage = imagecreatefromstring(file_get_contents($logoPath));
 
         // Resize the logo
         $logoWidth = imagesx($logoImage);
         $logoHeight = imagesy($logoImage);
-        $newLogoWidth = (int) ($width / 5);
+        $newLogoWidth = (int) ($width / 3);
         $newLogoHeight = (int) ($logoHeight * ($newLogoWidth / $logoWidth));
-        $resizedLogoImage = imagecreatetruecolor($newLogoWidth, $newLogoHeight);
-        imagealphablending($resizedLogoImage, false);
-        imagesavealpha($resizedLogoImage, true);
-        imagecopyresampled($resizedLogoImage, $logoImage, 0, 0, 0, 0, $newLogoWidth, $newLogoHeight, $logoWidth, $logoHeight);
+
+        imagecolortransparent($logoImage , imagecolorallocatealpha($logoImage , 0, 0, 0, 127));
+        imagealphablending($logoImage , false);
+        imagesavealpha($logoImage , true);
+        imagecopyresampled($logoImage, $logoImage, 0, 0, 0, 0, $newLogoWidth, $newLogoHeight, $logoWidth, $logoHeight);
 
         // Calculate coordinates to place the logo at the center of the QR code
-        $qrWidth = imagesx($qrImage);
+        $qrWidth = imagesx($qrImage);                                                                                                                                                                                                                                                                                                                                                                                               
         $qrHeight = imagesy($qrImage);
         $logoX = ($qrWidth - $newLogoWidth) / 2;
         $logoY = ($qrHeight - $newLogoHeight) / 2;
 
         // Merge the logo onto the QR code
-        imagecopy($qrImage, $resizedLogoImage, $logoX, $logoY, 0, 0, $newLogoWidth, $newLogoHeight);
+        imagecopy($qrImage, $logoImage, $logoX, $logoY, 0, 0, $newLogoWidth, $newLogoHeight);
 
         // Save the final image to a file
         if (!imagepng($qrImage, $filePath)) {
@@ -327,7 +328,6 @@ class Tte extends General
         // Free up memory
         imagedestroy($qrImage);
         imagedestroy($logoImage);
-        imagedestroy($resizedLogoImage);
 
         // Delete temporary QR code image
         if (!unlink($qrTempPath)) {
@@ -355,7 +355,7 @@ class Tte extends General
         $imageTTE = null;
         if($data['tampilan'] == 'visible'){
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
-            $text = "Teks yang ingin ditampilkan saat QR code discan";
+            $text = "https://berkastte.rumkitsindhutrisno.com/webapps/berkastte/" . $fileName;
             $filePath = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/resources/image_tte/" . $NameimageTTE;
             $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/assets/logo_qrcode.png";
             try {
