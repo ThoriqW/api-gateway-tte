@@ -165,6 +165,12 @@ class Tte extends General
             if (!$data || !isset($data['name'], $data['nik'], $data['sign_image'])) {
                 throw new Exception('Invalid input data');
             }
+
+            $existingData = $this->Tte_model->getAkunTTEbyNik($data['nik']);
+
+            if ($existingData->num_rows() > 0) {
+                throw new Exception('Akun dengan nik ini sudah ada');
+            }
     
             $in['name'] = $data['name'];
             $in['nik'] = $data['nik'];
@@ -219,6 +225,31 @@ class Tte extends General
             ]);
         }
     }
+    function deleteAkunTTE_post()
+    {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+    
+            $nik = $data['nik'];
+    
+            $this->Tte_model->deleteTTE($nik);
+            
+            echo json_encode([
+                'metadata' => [
+                    'code' => 200,
+                    'message' => 'Data delete successfully'
+                ],
+                'response' => $nik
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'metadata' => [
+                    'code' => 400,
+                    'message' => $e->getMessage()
+                ]
+            ]);
+        }
+    }
     function signfile_post()
     {
         $data = $this->input->post();
@@ -236,6 +267,7 @@ class Tte extends General
             $fileType = $_FILES['file']['type'];
             $fileSize = $_FILES['file']['size'];
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
+            file_put_contents("tag", $data['tag']);
             $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/resources/image_tte/" . $NameimageTTE;
             $response = tteSign($data['nik'], $data['passphrase'], $tempFile, $data['tag'], $data['image'], $imageTTE);
             switch ($data['applications']) {
@@ -355,7 +387,7 @@ class Tte extends General
         $imageTTE = null;
         if($data['tampilan'] == 'visible'){
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
-            $text = "https://berkastte.rumkitsindhutrisno.com/webapps/berkastte/" . $fileName;
+            $text = "https://qrcodette.rssindhutrisnopalu.com/home/" . $data['location'] . "/" . $data['id'] . "/" . $fileName;
             $filePath = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/resources/image_tte/" . $NameimageTTE;
             $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/assets/logo_qrcode.png";
             try {

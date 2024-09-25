@@ -26,4 +26,24 @@ class Tte_model extends Api_model
         $query = $this->db->get();
         return $query;
     }
+    public function deleteTTE($nik)
+    {
+        if (!empty($nik)) {
+            $this->db->where('nik', $nik);
+            $result = $this->db->delete('akun_tte');
+            return $result;
+        } else {
+            return false;
+        }
+    }
+    public function getAkunTTEbyNik($nik)
+    {
+        if (!empty($nik)) {
+            $this->db->where('nik', $nik);
+            $result = $this->db->get('akun_tte');
+            return $result;
+        } else {
+            return false;
+        }
+    }
 }

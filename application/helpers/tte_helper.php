@@ -115,7 +115,7 @@ if (!function_exists('tte_helper')) {
                 'linkQR' => 'https://google.com',
                 'width' => $width,
                 'height' => $height,
-                'tag_koordinat' => "#"
+                'tag_koordinat' => $tag
                 // 'page'=>1,
 
             );
@@ -230,12 +230,13 @@ if (!function_exists('tte_helper')) {
         curl_close($curl);
         return $responseFile;
     }
-    function tteSign($nik = null, $passphrase = null, $tempFile = null, $tag = '#', $image = false, $imageFile = null)
+    function tteSign($nik = null, $passphrase = null, $tempFile = null, $tag = '|', $image = false, $imageFile = null)
     {
         $host = config_item("UrlBSSN") . "/api/sign/pdf";
         $curl = curl_init($host);
         $username = config_item("UsernameBSSN");
         $password = config_item("PasswordBSSN");
+        file_put_contents("tag", $tag);
         if ($image == true) {
             $fields = array(
                 'file' => new CurlFile(@$tempFile, 'application/pdf'),
@@ -243,10 +244,10 @@ if (!function_exists('tte_helper')) {
                 'nik' => $nik,
                 'passphrase' => $passphrase,
                 'tampilan' => 'visible',
-                'image' => 'true',
+                // 'image' => 'true',
                 'linkQR' => 'https://google.com',
-                'width' => '250',
-                'height' => '250',
+                'width' => '350',
+                'height' => '350',
                 'tag_koordinat' => $tag
             );
         } else {
