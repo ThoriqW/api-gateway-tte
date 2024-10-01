@@ -140,6 +140,9 @@ if (!function_exists('tte_helper')) {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
+        $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'statuscodehelper.log';
+        file_put_contents($fps, $statusCode);
         if (json_decode($response, true) == null) {
             $responseFile = $response;
         } else {
