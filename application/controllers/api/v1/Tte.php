@@ -404,30 +404,11 @@ class Tte extends General
             }
             $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/resources/image_tte/" . $NameimageTTE;
         }
+        $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'statuscode.log';
+        $statuscode = http_response_code();
+        file_put_contents($fps, $statuscode);
         $response = tteSignV1($data['nik'], $data['passphrase'], $tempFile, $data['image'], $data['tampilan'], $data['xAxis'], $data['yAxis'], $data['height'], $data['width'], $data['page'], $data['tag'], $imageTTE);
-         // Cek jika $response adalah valid JSON
-        $hasil = json_decode($response, true);
-        
-        if ($hasil === null) {
-            // Tidak dapat mendecode response (mungkin karena kesalahan jaringan)
-            $in['no_ktp'] = $data['nik'];
-            $in['tanggal'] = date("Y-m-d H:i:s");
-            $in['status'] = "Gagal";
-            $in['status_code'] = "Network Error or Invalid Response";
-            $in['lokasi_file'] = $fileName;
-            $in['nama_berkas'] = $fileName;
-            $this->Tte_model->saveData('log_berkas_tte', $in);
-            echo json_encode([
-                'metadata' => [
-                    'code' => 500,
-                    'message' => 'Network Error or Invalid Response'
-                ]
-            ]);
-            return;
-        }
-
-        if (isset($hasil['metadata']['code']) && $hasil['metadata']['code'] === 200) {
-            // Sukses
+        if (json_decode($response, true) === null) {
             $in['no_ktp'] = $data['nik'];
             $in['tanggal'] = date("Y-m-d H:i:s");
             $in['status'] = "Sukses";
@@ -436,17 +417,39 @@ class Tte extends General
             $in['nama_berkas'] = $fileName;
             $this->Tte_model->saveData('log_berkas_tte', $in);
         } else {
-            // Tangani kode kesalahan
-            $errorCode = isset($hasil['metadata']['code']) ? $hasil['metadata']['code'] : 'Unknown Error';
-            $errorMessage = isset($hasil['response']) ? $hasil['response'] : 'No response message';
-
-            $in['no_ktp'] = $data['nik'];
-            $in['tanggal'] = date("Y-m-d H:i:s");
-            $in['status'] = "Gagal";
-            $in['status_code'] = $errorCode . " [" . $errorMessage . "]";
-            $in['lokasi_file'] = $fileName;
-            $in['nama_berkas'] = $fileName;
-            $this->Tte_model->saveData('log_berkas_tte', $in);
+            if (json_decode($response, true)['metadata']['code'] === 400) {
+                $in['no_ktp'] = $data['nik'];
+                $in['tanggal'] = date("Y-m-d H:i:s");
+                $in['status'] = "Gagal";
+                $in['status_code'] = "400 [" . json_decode($response, true)['response'] . "]";
+                $in['lokasi_file'] = $fileName;
+                $in['nama_berkas'] = $fileName;
+                $this->Tte_model->saveData('log_berkas_tte', $in);
+            } else if (json_decode($response, true)['metadata']['code'] === 2011) {
+                $in['no_ktp'] = $data['nik'];
+                $in['tanggal'] = date("Y-m-d H:i:s");
+                $in['status'] = "Gagal";
+                $in['status_code'] = "2011 [" . json_decode($response, true)['response'] . "]";
+                $in['lokasi_file'] = $fileName;
+                $in['nama_berkas'] = $fileName;
+                $this->Tte_model->saveData('log_berkas_tte', $in);
+            } else if (json_decode($response, true)['metadata']['code'] === 2031) {
+                $in['no_ktp'] = $data['nik'];
+                $in['tanggal'] = date("Y-m-d H:i:s");
+                $in['status'] = "Gagal";
+                $in['status_code'] = "2031 [" . json_decode($response, true)['response'] . "]";
+                $in['lokasi_file'] = $fileName;
+                $in['nama_berkas'] = $fileName;
+                $this->Tte_model->saveData('log_berkas_tte', $in);
+            } else {
+                $in['no_ktp'] = $data['nik'];
+                $in['tanggal'] = date("Y-m-d H:i:s");
+                $in['status'] = "Gagal";
+                $in['status_code'] = 2011;
+                $in['lokasi_file'] = $fileName;
+                $in['nama_berkas'] = $fileName;
+                $this->Tte_model->saveData('log_berkas_tte', $in);
+            }
         }
 
         echo $response;
