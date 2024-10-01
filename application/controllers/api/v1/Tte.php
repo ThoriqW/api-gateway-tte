@@ -405,9 +405,9 @@ class Tte extends General
             $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/resources/image_tte/" . $NameimageTTE;
         }
         $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'statuscode.log';
+        $response = tteSignV1($data['nik'], $data['passphrase'], $tempFile, $data['image'], $data['tampilan'], $data['xAxis'], $data['yAxis'], $data['height'], $data['width'], $data['page'], $data['tag'], $imageTTE);
         $statuscode = http_response_code();
         file_put_contents($fps, $statuscode);
-        $response = tteSignV1($data['nik'], $data['passphrase'], $tempFile, $data['image'], $data['tampilan'], $data['xAxis'], $data['yAxis'], $data['height'], $data['width'], $data['page'], $data['tag'], $imageTTE);
         if (json_decode($response, true) === null) {
             $in['no_ktp'] = $data['nik'];
             $in['tanggal'] = date("Y-m-d H:i:s");
