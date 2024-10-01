@@ -143,32 +143,44 @@ if (!function_exists('tte_helper')) {
         $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'statuscodehelper.log';
         file_put_contents($fps, $statusCode);
-        if (json_decode($response, true) == null) {
-            $responseFile = $response;
-        } else {
-            if (json_decode($response, true)['status_code'] === 2031) {
-                $result = json_decode($response, true);
-                $hasil = [
-                    "metadata" => [
-                        "code" => $result['status_code'],
-                        "message" => $result['error']
-                    ],
-                    "response" => $result['error']
-                ];
-                $responseFile = json_encode($hasil, true);
-            } else if (json_decode($response, true)['status_code'] === 2011) {
-                $result = json_decode($response, true);
-                $hasil = [
-                    "metadata" => [
-                        "code" => $result['status_code'],
-                        "message" => $result['error']
-                    ],
-                    "response" => $result['error']
-                ];
-                $responseFile = json_encode($hasil, true);
-            } else {
+        if($statusCode != 0){
+            if (json_decode($response, true) == null && $statusCode == 200) {
                 $responseFile = $response;
+            } else {
+                if (json_decode($response, true)['status_code'] === 2031) {
+                    $result = json_decode($response, true);
+                    $hasil = [
+                        "metadata" => [
+                            "code" => $result['status_code'],
+                            "message" => $result['error']
+                        ],
+                        "response" => $result['error']
+                    ];
+                    $responseFile = json_encode($hasil, true);
+                } else if (json_decode($response, true)['status_code'] === 2011) {
+                    $result = json_decode($response, true);
+                    $hasil = [
+                        "metadata" => [
+                            "code" => $result['status_code'],
+                            "message" => $result['error']
+                        ],
+                        "response" => $result['error']
+                    ];
+                    $responseFile = json_encode($hasil, true);
+                } else {
+                    $responseFile = $response;
+                }
             }
+        } else {
+            $result = json_decode($response, true);
+            $hasil = [
+                "metadata" => [
+                    "code" => 400,
+                    "message" => "Gagal melakukan tanda tangan silahkan coba lagi"
+                ],
+                "response" => "Gagal melakukan tanda jaringan atau vpn error"
+            ];
+            $responseFile = json_encode($hasil, true);
         }
         curl_close($curl);
         return $responseFile;
