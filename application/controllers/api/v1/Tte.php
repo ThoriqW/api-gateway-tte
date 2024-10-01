@@ -268,7 +268,7 @@ class Tte extends General
             $fileSize = $_FILES['file']['size'];
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
             file_put_contents("tag", $data['tag']);
-            $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/resources/image_tte/" . $NameimageTTE;
+            $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/resources/image_tte/" . $NameimageTTE;
             $response = tteSign($data['nik'], $data['passphrase'], $tempFile, $data['tag'], $data['image'], $imageTTE);
             switch ($data['applications']) {
                 case "simrs":
@@ -388,8 +388,8 @@ class Tte extends General
         if($data['tampilan'] == 'visible'){
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
             $text = "https://qrcodette.rssindhutrisnopalu.com/home/" . $data['location'] . "/" . $data['id'] . "/" . $fileName;
-            $filePath = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/resources/image_tte/" . $NameimageTTE;
-            $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/assets/logo_qrcode.png";
+            $filePath = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/resources/image_tte/" . $NameimageTTE;
+            $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/assets/logo_qrcode.png";
             try {
                 $this->generateQRCodeImage($text, "300", $filePath, $logoPath);
             } catch (Exception $e) {
@@ -402,7 +402,7 @@ class Tte extends General
                 file_put_contents($filePath, $e);
                 return;
             }
-            $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api_gateway/resources/image_tte/" . $NameimageTTE;
+            $imageTTE = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/resources/image_tte/" . $NameimageTTE;
         }
         $response = tteSignV1($data['nik'], $data['passphrase'], $tempFile, $data['image'], $data['tampilan'], $data['xAxis'], $data['yAxis'], $data['height'], $data['width'], $data['page'], $data['tag'], $imageTTE);
         if (json_decode($response, true) === null) {
