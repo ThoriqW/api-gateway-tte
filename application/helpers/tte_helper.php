@@ -167,6 +167,16 @@ if (!function_exists('tte_helper')) {
                         "response" => $result['error']
                     ];
                     $responseFile = json_encode($hasil, true);
+                } else if (json_decode($response, true)['status_code'] === 2021) {
+                    $result = json_decode($response, true);
+                    $hasil = [
+                        "metadata" => [
+                            "code" => $result['status_code'],
+                            "message" => $result['error']
+                        ],
+                        "response" => $result['error']
+                    ];
+                    $responseFile = json_encode($hasil, true);
                 } else {
                     $responseFile = $response;
                 }
