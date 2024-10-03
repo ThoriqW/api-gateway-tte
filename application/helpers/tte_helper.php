@@ -103,92 +103,88 @@ if (!function_exists('tte_helper')) {
         $host = config_item("UrlBSSN") . "/api/sign/pdf";
         $username = config_item("UsernameBSSN");
         $password = config_item("PasswordBSSN");
-        
         $curl = curl_init($host);
-        
-        $fields = [
-            'file' => new CurlFile($tempFile, 'application/pdf'),
-            'nik' => $nik,
-            'passphrase' => $passphrase,
-            'tampilan' => $tampilan,
-        ];
-        
-        if ($image) {
-            $fields['imageTTD'] = new CurlFile($imageFile, 'image/png');
-            $fields['image'] = 'true';
-            $fields['linkQR'] = 'https://google.com';
-            $fields['width'] = $width;
-            $fields['height'] = $height;
-            $fields['tag_koordinat'] = $tag;
+        if ($image == "true") {
+            $fields = array(
+                'file' => new CurlFile(@$tempFile, 'application/pdf'),
+                'nik' => $nik,
+                'passphrase' => $passphrase,
+                'imageTTD' => new CurlFile(@$imageFile, 'image/png'),
+                'tampilan' => 'visible',
+                'image' => 'true',
+                'linkQR' => 'https://google.com',
+                'width' => $width,
+                'height' => $height,
+                'tag_koordinat' => $tag
+                // 'page'=>1,
+
+            );
+        } else {
+            $fields = array(
+                'file' => new CurlFile(@$tempFile, 'application/pdf'),
+                'nik' => $nik,
+                'passphrase' => $passphrase,
+                'tampilan' => $tampilan,
+            );
         }
-    
-        curl_setopt_array($curl, [
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_USERPWD => "$username:$password",
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => $fields,
-            CURLOPT_RETURNTRANSFER => true,
-        ]);
-    
+        curl_setopt($curl, CURLOPT_URL, $host);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_USERPWD, $username . ":" . $password);
+        curl_setopt($curl, CURLOPT_ENCODING, "");
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 0);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
         $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        
-        // Logging status code
-        file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/webapps/statuscodehelper.log", $statusCode);
-    
-        if ($statusCode !== 200) {
+        $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'statuscodehelper.log';
+        file_put_contents($fps, $statusCode);
+        if($statusCode != 0){
+            if (json_decode($response, true) == null && $statusCode == 200) {
+                $responseFile = $response;
+            } else {
+                if (json_decode($response, true)['status_code'] === 2031) {
+                    $result = json_decode($response, true);
+                    $hasil = [
+                        "metadata" => [
+                            "code" => $result['status_code'],
+                            "message" => $result['error']
+                        ],
+                        "response" => $result['error']
+                    ];
+                    $responseFile = json_encode($hasil, true);
+                } else if (json_decode($response, true)['status_code'] === 2011) {
+                    $result = json_decode($response, true);
+                    $hasil = [
+                        "metadata" => [
+                            "code" => $result['status_code'],
+                            "message" => $result['error']
+                        ],
+                        "response" => $result['error']
+                    ];
+                    $responseFile = json_encode($hasil, true);
+                } else {
+                    $responseFile = $response;
+                }
+            }
+        } else {
+            $result = json_decode($response, true);
             $hasil = [
                 "metadata" => [
                     "code" => 400,
-                    "message" => "Gagal melakukan tanda tangan, silahkan coba lagi."
+                    "message" => "Gagal melakukan tanda tangan silahkan coba lagi"
                 ],
-                "response" => "Error: " . curl_error($curl)
+                "response" => "Gagal melakukan tanda jaringan atau vpn error"
             ];
-            curl_close($curl);
-            return json_encode($hasil, true);
+            $responseFile = json_encode($hasil, true);
         }
-    
-        // Decode response
-        $decodedResponse = json_decode($response, true);
-    
-        if ($decodedResponse === null) {
-            $hasil = [
-                "metadata" => [
-                    "code" => 500,
-                    "message" => "Kesalahan saat mendekode respons."
-                ],
-                "response" => "Invalid JSON response"
-            ];
-            curl_close($curl);
-            return json_encode($hasil, true);
-        }
-    
-        // Handling specific error codes
-        if (isset($decodedResponse['status_code'])) {
-            $statusCode = $decodedResponse['status_code'];
-            $errorMessage = $decodedResponse['error'];
-            $hasil = [
-                "metadata" => [
-                    "code" => $statusCode,
-                    "message" => $errorMessage
-                ],
-                "response" => $errorMessage
-            ];
-            curl_close($curl);
-            return json_encode($hasil, true);
-        }
-    
-        // If everything is fine, return the response
         curl_close($curl);
-        return $response;
+        return $responseFile;
     }
-    
     function tteSignVerify($nik = null, $passphrase = null, $tempFile = null, $tag = '#', $image = false, $imageFile = null)
     {
         $host = config_item("UrlBSSN") . "/tte/api/sign/verify";
