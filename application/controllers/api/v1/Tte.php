@@ -390,7 +390,7 @@ class Tte extends General
                 echo json_encode([
                     'metadata' => [
                         'code' => 501,
-                        'message' => "Nik belum terdaftar di simrs"
+                        'message' => "NIK belum terdaftar di SIMRS"
                     ]
                 ]);
                 $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'errornik.log';
