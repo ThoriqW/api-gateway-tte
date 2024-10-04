@@ -452,11 +452,19 @@ class Tte extends General
                 $in['lokasi_file'] = $fileName;
                 $in['nama_berkas'] = $fileName;
                 $this->Tte_model->saveData('log_berkas_tte', $in);
+            } else if (json_decode($response, true)['metadata']['code'] === 2021) {
+                $in['no_ktp'] = $data['nik'];
+                $in['tanggal'] = date("Y-m-d H:i:s");
+                $in['status'] = "Gagal";
+                $in['status_code'] = "2021 [" . json_decode($response, true)['response'] . "]";
+                $in['lokasi_file'] = $fileName;
+                $in['nama_berkas'] = $fileName;
+                $this->Tte_model->saveData('log_berkas_tte', $in);
             } else {
                 $in['no_ktp'] = $data['nik'];
                 $in['tanggal'] = date("Y-m-d H:i:s");
                 $in['status'] = "Gagal";
-                $in['status_code'] = 2011;
+                $in['status_code'] = 500;
                 $in['lokasi_file'] = $fileName;
                 $in['nama_berkas'] = $fileName;
                 $this->Tte_model->saveData('log_berkas_tte', $in);

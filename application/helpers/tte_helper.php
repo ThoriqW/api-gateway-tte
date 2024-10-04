@@ -178,7 +178,15 @@ if (!function_exists('tte_helper')) {
                     ];
                     $responseFile = json_encode($hasil, true);
                 } else {
-                    $responseFile = $response;
+                    $result = json_decode($response, true);
+                    $hasil = [
+                        "metadata" => [
+                            "code" => 400,
+                            "message" => $result['error']
+                        ],
+                        "response" => $result['error']
+                    ];
+                    $responseFile = json_encode($hasil, true);
                 }
             }
         } else {
