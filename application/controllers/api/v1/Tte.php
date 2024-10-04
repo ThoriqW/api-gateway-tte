@@ -386,6 +386,19 @@ class Tte extends General
         $fileSize = $_FILES['file']['size'];
         $imageTTE = null;
         if($data['tampilan'] == 'visible'){
+            try {
+                $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
+            } catch (Exception $e) {
+                echo json_encode([
+                    'metadata' => [
+                        'code' => 400,
+                        'message' => $e->getMessage()
+                    ]
+                ]);
+                $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'errornik.log';
+                file_put_contents($fps, $e);
+                return;
+            }
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
             $text = "https://qrcodette.rssindhutrisnopalu.com/home/" . $data['location'] . "/" . $data['id'] . "/" . $fileName;
             $filePath = $_SERVER['DOCUMENT_ROOT'] . "/api-gateway/resources/image_tte/" . $NameimageTTE;
@@ -445,7 +458,7 @@ class Tte extends General
                 $in['no_ktp'] = $data['nik'];
                 $in['tanggal'] = date("Y-m-d H:i:s");
                 $in['status'] = "Gagal";
-                $in['status_code'] = 2011;
+                $in['status_code'] = 2021;
                 $in['lokasi_file'] = $fileName;
                 $in['nama_berkas'] = $fileName;
                 $this->Tte_model->saveData('log_berkas_tte', $in);
