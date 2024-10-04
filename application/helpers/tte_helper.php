@@ -188,7 +188,7 @@ if (!function_exists('tte_helper')) {
                     "code" => 400,
                     "message" => "Gagal melakukan tanda tangan silahkan coba lagi"
                 ],
-                "response" => "Gagal melakukan tanda jaringan atau vpn error"
+                "response" => "Gagal melakukan tanda tangan jaringan atau vpn error"
             ];
             $responseFile = json_encode($hasil, true);
         }

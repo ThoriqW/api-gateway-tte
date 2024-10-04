@@ -456,7 +456,7 @@ class Tte extends General
                 $in['no_ktp'] = $data['nik'];
                 $in['tanggal'] = date("Y-m-d H:i:s");
                 $in['status'] = "Gagal";
-                $in['status_code'] = 2021;
+                $in['status_code'] = 2011;
                 $in['lokasi_file'] = $fileName;
                 $in['nama_berkas'] = $fileName;
                 $this->Tte_model->saveData('log_berkas_tte', $in);
