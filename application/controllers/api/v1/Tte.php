@@ -386,17 +386,15 @@ class Tte extends General
         $fileSize = $_FILES['file']['size'];
         $imageTTE = null;
         if($data['tampilan'] == 'visible'){
-            try {
-                $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
-            } catch (Exception $e) {
+            if($this->Tte_model->getDataImageTTE($data['nik']) === null){
                 echo json_encode([
                     'metadata' => [
                         'code' => 400,
-                        'message' => $e->getMessage()
+                        'message' => "Nik belum terdaftar di simrs"
                     ]
                 ]);
                 $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'errornik.log';
-                file_put_contents($fps, $e);
+                file_put_contents($fps, "nik belum terdaftar di smrs");
                 return;
             }
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
