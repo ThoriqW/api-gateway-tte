@@ -389,12 +389,12 @@ class Tte extends General
             if($this->Tte_model->getDataImageTTE($data['nik'])->num_rows() === 0){
                 echo json_encode([
                     'metadata' => [
-                        'code' => 400,
+                        'code' => 501,
                         'message' => "Nik belum terdaftar di simrs"
                     ]
                 ]);
                 $fps = $_SERVER['DOCUMENT_ROOT'] . "/webapps/" . 'errornik.log';
-                file_put_contents($fps, "nik belum terdaftar di smrs");
+                file_put_contents($fps, "NIK belum terdaftar di SIMRS");
                 return;
             }
             $NameimageTTE = $this->Tte_model->getDataImageTTE($data['nik'])->row()->sign_image;
