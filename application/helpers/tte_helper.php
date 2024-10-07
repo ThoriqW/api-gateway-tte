@@ -147,44 +147,56 @@ if (!function_exists('tte_helper')) {
             if (json_decode($response, true) == null && $statusCode == 200) {
                 $responseFile = $response;
             } else {
-                if (json_decode($response, true)['status_code'] === 2031) {
-                    $result = json_decode($response, true);
-                    $hasil = [
-                        "metadata" => [
-                            "code" => $result['status_code'],
-                            "message" => $result['error']
-                        ],
-                        "response" => $result['error']
-                    ];
-                    $responseFile = json_encode($hasil, true);
-                } else if (json_decode($response, true)['status_code'] === 2011) {
-                    $result = json_decode($response, true);
-                    $hasil = [
-                        "metadata" => [
-                            "code" => $result['status_code'],
-                            "message" => $result['error']
-                        ],
-                        "response" => $result['error']
-                    ];
-                    $responseFile = json_encode($hasil, true);
-                } else if (json_decode($response, true)['status_code'] === 2021) {
-                    $result = json_decode($response, true);
-                    $hasil = [
-                        "metadata" => [
-                            "code" => $result['status_code'],
-                            "message" => $result['error']
-                        ],
-                        "response" => $result['error']
-                    ];
-                    $responseFile = json_encode($hasil, true);
+                if (json_decode($response, true)){
+                    if (json_decode($response, true)['status_code'] === 2031) {
+                        $result = json_decode($response, true);
+                        $hasil = [
+                            "metadata" => [
+                                "code" => $result['status_code'],
+                                "message" => $result['error']
+                            ],
+                            "response" => $result['error']
+                        ];
+                        $responseFile = json_encode($hasil, true);
+                    } else if (json_decode($response, true)['status_code'] === 2011) {
+                        $result = json_decode($response, true);
+                        $hasil = [
+                            "metadata" => [
+                                "code" => $result['status_code'],
+                                "message" => $result['error']
+                            ],
+                            "response" => $result['error']
+                        ];
+                        $responseFile = json_encode($hasil, true);
+                    } else if (json_decode($response, true)['status_code'] === 2021) {
+                        $result = json_decode($response, true);
+                        $hasil = [
+                            "metadata" => [
+                                "code" => $result['status_code'],
+                                "message" => $result['error']
+                            ],
+                            "response" => $result['error']
+                        ];
+                        $responseFile = json_encode($hasil, true);
+                    } else {
+                        $result = json_decode($response, true);
+                        $hasil = [
+                            "metadata" => [
+                                "code" => 400,
+                                "message" => $result['error']
+                            ],
+                            "response" => $result['error']
+                        ];
+                        $responseFile = json_encode($hasil, true);
+                    }
                 } else {
                     $result = json_decode($response, true);
                     $hasil = [
                         "metadata" => [
                             "code" => 400,
-                            "message" => $result['error']
+                            "message" => "Gagal melakukan tanda tangan silahkan coba lagi, kode tte salah"
                         ],
-                        "response" => $result['error']
+                        "response" => "Gagal melakukan tanda tangan kode tte salah"
                     ];
                     $responseFile = json_encode($hasil, true);
                 }
